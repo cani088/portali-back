@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Article;
 use App\Models\Comment;
 use DB;
+use \Carbon;
 use App\Http\Resources\Article as ArticleResource;
 
 class ArticleController extends Controller
@@ -18,7 +19,10 @@ class ArticleController extends Controller
 
 
     public function getArticleApi($id){
-        $article=Article::find($id)->with('comments','tags')->first();
+        $article=Article::where('article_id',$id)->with('comments','tags')->get();
+        foreach($article[0]->comments as &$a){
+            $a->human_readable=Carbon\Carbon::createFromTimeStamp($a->created_at_t)->diffForHumans();
+        }
         return $article;         
     }
 
