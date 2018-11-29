@@ -16,4 +16,5 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('/article/{id}','ArticleController@getArticleApi');
+Route::get('/article/{id}','ArticleController@getArticleData');
+Route::get('/article/{id}/comments','CommentsController@getArticleComments');
