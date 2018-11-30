@@ -24,10 +24,18 @@ class ArticleController extends Controller
 
 
     public function articles(){
-        DB::enableQueryLog();
-        $articles=Article::orderBy('article_id','desc')->with('comments','tags')->paginate(2);
-        return ArticleResource::collection($articles);
+        return Article::
+            select('articles.*',
+            DB::raw("(SELECT count(*) from article_likes where article_likes.article_id=articles.article_id) as total_likes"),
+            DB::raw("(SELECT count(*) from comments where comments.article_id=articles.article_id) as total_comments"))
+            ->orderBy('article_id','desc')
+            ->get();
     }
+    // public function articles(){
+    //     DB::enableQueryLog();
+    //     $articles=Article::orderBy('article_id','desc')->with('comments','tags')->paginate(2);
+    //     return ArticleResource::collection($articles);
+    // }
 
     public function delete(Request $request){
         
