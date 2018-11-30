@@ -14,8 +14,5 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/article/{id}','ArticleController@getArticleById');
-Route::get('/articles','ArticleController@articles'); 
-Route::post('/article/delete','ArticleController@delete'); 
-Route::post('/article/add','ArticleController@add'); 
+
 

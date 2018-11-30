@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\Comment;
 use DB;
 use App\Http\Resources\Article as ArticleResource;
+use Carbon\Carbon;
 
 class ArticleController extends Controller
 {
@@ -23,13 +24,19 @@ class ArticleController extends Controller
     }
 
 
-    public function articles(){
-        return Article::
-            select('articles.*',
-            DB::raw("(SELECT count(*) from article_likes where article_likes.article_id=articles.article_id) as total_likes"),
-            DB::raw("(SELECT count(*) from comments where comments.article_id=articles.article_id) as total_comments"))
+    public function articlesByCategory($category){
+        $articles=Article::join('categories_articles','categories_articles.article_id','articles.article_id')
+            ->join('categories','categories.category_id','categories_articles.category_id')
+            ->where('category_name',$category)
+            ->select('articles.*',
+                DB::raw("(SELECT count(*) from article_likes where article_likes.article_id=articles.article_id) as total_likes"),
+                DB::raw("(SELECT count(*) from comments where comments.article_id=articles.article_id) as total_comments"))
             ->orderBy('article_id','desc')
             ->get();
+        foreach($articles as &$a){
+            $a->human_readable_time=Carbon::createFromTimeStamp($a->created_at_t)->diffForHumans();
+        }
+        return $articles;
     }
     // public function articles(){
     //     DB::enableQueryLog();

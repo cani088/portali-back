@@ -16,5 +16,15 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+
+//ArticleController
+Route::get('/articles/{category}','ArticleController@articlesByCategory'); 
 Route::get('/article/{id}','ArticleController@getArticleData');
+
+Route::post('/article/delete','ArticleController@delete'); 
+Route::post('/article/add','ArticleController@add'); 
+
+//CommentsController
 Route::get('/article/{id}/comments','CommentsController@getArticleComments');
