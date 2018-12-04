@@ -20,11 +20,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 //ArticleController
-Route::get('/articles/{category}','ArticleController@articlesByCategory'); 
 Route::get('/article/{id}','ArticleController@getArticleData');
+Route::get('/articles/{category}','ArticleController@articlesByCategory'); 
+Route::get('/articles/search/{keyword}','ArticleController@searchArticle');
 
 Route::post('/article/delete','ArticleController@delete'); 
 Route::post('/article/add','ArticleController@add'); 
+
 
 //CommentsController
 Route::get('/article/{id}/comments','CommentsController@getArticleComments');

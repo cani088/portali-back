@@ -24,25 +24,32 @@ class ArticleController extends Controller
     }
 
 
-    public function articlesByCategory($category){
+    public function articlesByCategory($category,$is_search=false){
+        $where_clause=[['category_name',$category]];
+        
+        if($is_search){
+            $where_clause=[['title','LIKE',"%".$category."%"],['body','LIKE',"%".$category."%"]];
+        }
+
         $articles=Article::join('categories_articles','categories_articles.article_id','articles.article_id')
             ->join('categories','categories.category_id','categories_articles.category_id')
-            ->where('category_name',$category)
+            ->where($where_clause)
             ->select('articles.*',
                 DB::raw("(SELECT count(*) from article_likes where article_likes.article_id=articles.article_id) as total_likes"),
                 DB::raw("(SELECT count(*) from comments where comments.article_id=articles.article_id) as total_comments"))
             ->orderBy('article_id','desc')
+            ->groupBy('article_id')
             ->get();
+            
         foreach($articles as &$a){
             $a->human_readable_time=Carbon::createFromTimeStamp($a->created_at_t)->diffForHumans();
         }
         return $articles;
     }
-    // public function articles(){
-    //     DB::enableQueryLog();
-    //     $articles=Article::orderBy('article_id','desc')->with('comments','tags')->paginate(2);
-    //     return ArticleResource::collection($articles);
-    // }
+
+    public function searchArticle($keyword){
+        return $this->articlesByCategory($keyword,true);
+    }
 
     public function delete(Request $request){
         
