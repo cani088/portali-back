@@ -30,3 +30,7 @@ Route::post('/article/add','ArticleController@add');
 
 //CommentsController
 Route::get('/article/{id}/comments','CommentsController@getArticleComments');
+
+//UserController
+Route::post('/user/register','UserController@register');
+Route::post('/user/login','UserController@login');

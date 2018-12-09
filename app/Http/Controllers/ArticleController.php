@@ -50,6 +50,7 @@ class ArticleController extends Controller
             ->get();
         foreach($articles as &$a){
             $a->human_readable_time=Carbon::createFromTimeStamp($a->created_at_t)->diffForHumans();
+            $a->article_date=Carbon::createFromTimeStamp($a->article_date)->format('d.m.Y');
         }
         return $articles;
     }

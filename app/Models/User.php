@@ -8,4 +8,6 @@ class User extends Model
 {
     protected $table='users';
     protected $primaryKey='user_ids';
+
+    public $hidden=['user_password'];
 }
