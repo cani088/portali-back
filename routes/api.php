@@ -26,10 +26,13 @@ Route::get('/articles/search/{keyword}','ArticleController@searchArticle');
 
 Route::post('/article/delete','ArticleController@delete'); 
 Route::post('/article/add','ArticleController@add'); 
-
+Route::post('/article/like','ArticleController@likeArticle');
+Route::post('/article/unlike','ArticleController@unLikeArticle');
 
 //CommentsController
 Route::get('/article/{id}/comments','CommentsController@getArticleComments');
+
+Route::post('/comment/submit','CommentsController@addComment');
 
 //UserController
 Route::post('/user/register','UserController@register');

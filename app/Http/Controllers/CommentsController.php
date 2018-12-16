@@ -16,7 +16,7 @@ class CommentsController extends Controller
         // DB::enableQueryLog();
         $comments= Comment::where('article_id',$id)
 			->leftJoin('users','users.user_id','comments.user_id')
-            ->select('users.user_name','users.user_id','comments.*',
+            ->select('users.username','users.user_id','comments.*',
             DB::raw("(SELECT count(*) from comment_likes where user_id=$user_id and comment_likes.comment_id=comments.comment_id) as is_like"),
             DB::raw("(SELECT count(*) from comment_likes where comment_likes.comment_id=comments.comment_id) as total_likes")
             )
@@ -26,5 +26,25 @@ class CommentsController extends Controller
         }
 
         return $comments;
+    }
+
+    public function addComment(Request $request){
+        $depth=0;
+
+        if($request->parent>0){
+            $depth=Comment::findOrFail($request->parent)->depth;
+        }
+
+        $comment=new Comment;
+
+        $comment->comment_body=$request->comment_body;
+        $comment->article_id=$request->article_id;
+        $comment->depth=(int) $depth++;
+        $comment->parent=$request->parent;
+        $comment->created_at_t=time();
+
+        $comment->save();
+
+        return response()->json(['comment'=>$comment,'success'=>1]);
     }
 }

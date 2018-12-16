@@ -30,8 +30,9 @@ class ArticleController extends Controller
         return $article;         
     }
 
-    public function articlesByCategory($category,$is_search=false){
-        
+    public function articlesByCategory(Request $request,$category,$is_search=false){
+        // $user_id=$request->user->user_id;
+        $user_id=1;
         $articles=Article::join('categories_articles','categories_articles.article_id','articles.article_id')
             ->join('categories','categories.category_id','categories_articles.category_id')
             ->where(function($query) use ($category,$is_search){
@@ -44,6 +45,7 @@ class ArticleController extends Controller
             })
             ->select('articles.*',
                 DB::raw("(SELECT count(*) from article_likes where article_likes.article_id=articles.article_id) as total_likes"),
+                DB::raw("(SELECT like_type from article_likes where article_likes.article_id=articles.article_id and user_id=$user_id) as total_likes"),
                 DB::raw("(SELECT count(*) from comments where comments.article_id=articles.article_id) as total_comments"))
             ->groupBy('articles.article_id')
             ->orderBy('articles.article_id','desc')
@@ -51,6 +53,8 @@ class ArticleController extends Controller
         foreach($articles as &$a){
             $a->human_readable_time=Carbon::createFromTimeStamp($a->created_at_t)->diffForHumans();
             $a->article_date=Carbon::createFromTimeStamp($a->article_date)->format('d.m.Y');
+            //temp
+            $a->is_like=1;
         }
         return $articles;
     }
@@ -74,4 +78,39 @@ class ArticleController extends Controller
             return response()->json(['message'=>'Article Inserted','success'=>1,'article'=>$article]);
         }
     }
+    
+    public function likeArticle(Request $request){
+        return self::likeUnlikeArticle($request,1,0);
+    }
+
+    public function unLikeArticle(Request $request){
+        return self::likeUnlikeArticle($request,0,1);
+    }
+
+    
+    public static function likeUnlikeArticle(Request $request,$type,$oposite){
+        // $user_id=$request->user->user_id;
+        $user_id=1;
+        //1 like
+        //0 unlike
+        $status=DB::table('article_likes')
+            ->where([['user_id',$user_id],['article_id',$request->article_id],['like_type',$type]])
+            ->count();
+    
+        if($status>0){
+            return response()->json(['success'=>0]);        
+        }    
+
+        //delete existing like or dislike from the user on the article
+        DB::table('article_likes')
+            ->where(['user_id'=>$user_id,'article_id'=>$request->article_id,'like_type'=>$oposite])
+            ->delete();
+
+        //add like/dislike to article
+        DB::table('article_likes')
+            ->insert(['user_id'=>$user_id,'article_id'=>$request->article_id,'like_type'=>$type]);
+        
+        return response()->json(['success'=>1]);     
+    }
+
 }
