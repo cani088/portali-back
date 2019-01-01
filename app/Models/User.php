@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model
 {
     protected $table='users';
-    protected $primaryKey='user_ids';
+    protected $primaryKey = 'user_id';
 
-    public $hidden=['user_password'];
+    public $hidden=['password'];
 }
