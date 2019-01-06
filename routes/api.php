@@ -28,6 +28,7 @@ Route::post('/article/delete','ArticleController@delete');
 Route::post('/article/add','ArticleController@add'); 
 Route::post('/article/like','ArticleController@likeArticle');
 Route::post('/article/unlike','ArticleController@unLikeArticle');
+Route::post('/article/removeVote','ArticleController@removeVote');
 
 //CommentsController
 Route::get('/article/{id}/comments','CommentsController@getArticleComments');

@@ -22,7 +22,8 @@ class ArticleController extends Controller
         $article=Article::where('article_id',$id)
             ->select('articles.*',
                 DB::raw("(SELECT count(*) from article_likes where article_likes.article_id=articles.article_id) as total_likes"),
-                DB::raw("(SELECT count(*) from comments where comments.article_id=articles.article_id) as total_comments")
+                DB::raw("(SELECT count(*) from comments where comments.article_id=articles.article_id) as total_comments"),
+                DB::raw("(SELECT like_type from article_likes where article_likes.article_id=articles.article_id and article_likes.user_id=1) as like_type")
             )
             ->with('tags')
             ->first();
@@ -113,4 +114,10 @@ class ArticleController extends Controller
         return response()->json(['success'=>1]);     
     }
 
+
+    public function removeVote(Request $request){
+        $user_id=1;
+        DB::table('article_likes')->where([['user_id',$user_id],['article_id',$request->article_id]])->delete();
+        return response()->json(['success'=>1]);    
+    }
 }
