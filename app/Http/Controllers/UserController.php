@@ -7,6 +7,7 @@ use App\Models\User;
 use DB;
 use Hash;
 use JWTAuth;
+use JWTFactory;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
@@ -47,10 +48,7 @@ class UserController extends Controller
     
     public function authenticate($email,$password)
     {
-        DB::enableQueryLog();
-        // $credentials = $request->only('email', 'password');
-        
-        // grab credentials from the request
+
         $credentials=['user_email'=>$email,'password'=>$password];
 
         try {
@@ -62,6 +60,15 @@ class UserController extends Controller
             // something went wrong whilst attempting to encode the token
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
+
+        $user=User::where('user_email',$email)->first();
+        $payload=[
+            'user_id'=>$user->user_id,
+            'user_email'=>$user->user_email,
+            'user_name'=>$user->user_name
+        ];
+
+        $token = JWTAuth::fromUser($user,$payload);
         // all good so return the token
         return response()->json(compact('token'));
     }
